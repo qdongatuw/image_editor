@@ -4,10 +4,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,6 +38,7 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
   }
 
   Future<void> _cropImage(File imageFile) async {
+    img.readFile(imageFile.toString());
     // Implement image cropping logic using image package or any other library
   }
 
