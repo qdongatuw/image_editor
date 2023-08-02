@@ -1,123 +1,74 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Image Editor',
-      home: ImageEditorPage(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Image Editor'),
+        ),
+        body: SplitView(),
+      ),
     );
   }
 }
 
-class ImageEditorPage extends StatefulWidget {
+class SplitView extends StatefulWidget {
   @override
-  _ImageEditorPageState createState() => _ImageEditorPageState();
+  _SplitViewState createState() => _SplitViewState();
 }
 
-class _ImageEditorPageState extends State<ImageEditorPage> {
-  List<File> _selectedImages = [];
+class _SplitViewState extends State<SplitView> {
+  List<File> images = []; // List to store selected images
 
-  void _pickImages() async {
-    List<XFile>? pickedImages =
-        await ImagePicker().pickMultiImage(imageQuality: 80);
-    if (pickedImages != null) {
+  Future<void> _addImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
       setState(() {
-        _selectedImages = pickedImages.map((file) => File(file.path)).toList();
+        images.add(File(pickedImage.path));
       });
     }
   }
 
-  Future<void> _cropImage(File imageFile) async {
-    img.readFile(imageFile.toString());
-    // Implement image cropping logic using image package or any other library
-  }
-
-  Future<void> _makeTransparent(File imageFile) async {
-    // Implement making the image background transparent using image package
-  }
-
-  Future<void> _invertColors(File imageFile) async {
-    // Implement inverting colors of the image using image package
-  }
-
-  Future<void> _convertToGrayscale(File imageFile) async {
-    // Implement converting the image to grayscale using image package
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Image Editor'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ElevatedButton(
-            onPressed: _pickImages,
-            child: Text('Pick Images'),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _selectedImages.length,
-              itemBuilder: (context, index) {
-                File imageFile = _selectedImages[index];
-                return ListTile(
-                  leading: Image.file(
-                    imageFile,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: images.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: Container(
+                  width: 100,
+                  child: Image.file(images[index], fit: BoxFit.contain),
                   ),
-                  title: Text(imageFile.path),
-                  onTap: () {
-                    // Show the image editor options here
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Edit Image'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => _cropImage(imageFile),
-                                child: Text('Crop'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => _makeTransparent(imageFile),
-                                child: Text('Make Transparent'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => _invertColors(imageFile),
-                                child: Text('Invert Colors'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => _convertToGrayscale(imageFile),
-                                child: Text('Convert to Grayscale'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                title: Text(images[index].path),
+                trailing: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    setState(() {
+                      images.removeAt(index);
+                    });
                   },
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+        ElevatedButton(
+          onPressed: _addImage,
+          child: Text('Add Image'),
+        ),
+      ],
     );
   }
 }
