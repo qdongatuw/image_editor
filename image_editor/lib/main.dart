@@ -146,12 +146,15 @@ class _ImageGridPageState extends State<ImageGridPage> {
               ListTile(
                 leading: Icon(Icons.rotate_left),
                 title: Text('Rotate'),
-                onTap: () {
+                onTap: () async {
                   // Rotate selected images logic here
                   for (var toProcess in selectedImages){
-                    setState(() {
-                      
-                    });
+                    final cmd = img.Command()
+                    ..decodeImageFile(toProcess.path)
+                    ..grayscale()
+                    ..trim()
+                    ..writeToFile('${toProcess.path}.update.png');
+                    await cmd.executeThread();
                   }
                 },
               ),
