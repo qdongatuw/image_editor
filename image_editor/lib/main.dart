@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'dart:io';
@@ -54,12 +55,11 @@ class _ImageGridPageState extends State<ImageGridPage> {
       appBar: AppBar(
         title: Text(titleOfApp),
       ),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5,
-        ),
-        itemCount: allImages.length,
-        itemBuilder: (context, index) {
+      body:SingleChildScrollView(child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+          spacing: 10,
+          runSpacing: 10,
+        children: List.generate(allImages.length, (index){
           return GestureDetector(
             onTap: () {
               setState(() {
@@ -96,8 +96,8 @@ class _ImageGridPageState extends State<ImageGridPage> {
               ],
             ),
           );
-        },
-      ),
+        }),
+      )) ,
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -112,6 +112,7 @@ class _ImageGridPageState extends State<ImageGridPage> {
           ),
         ],
       ),
+
        
       bottomNavigationBar: selectedImages.isNotEmpty
           ? BottomAppBar(
@@ -120,7 +121,8 @@ class _ImageGridPageState extends State<ImageGridPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${selectedImages.length} images selected'),
+
+                    Text('${selectedImages.length} images selected').animate().shake(),
                     ElevatedButton(
                       onPressed: () {
                         _showBottomSheet(context);
@@ -130,71 +132,49 @@ class _ImageGridPageState extends State<ImageGridPage> {
                   ],
                 ),
               ),
-            )
+            ).animate().fadeIn()
           : null,
     );
   }
+   
+   
+void _showBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        height: 200,
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              color: Colors.blue,
+              child: Center(
+                child: Text(
+                  '上部分可见内容',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  '下部分内容',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
-  void _showBottomSheet(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.rotate_left),
-                title: Text('Rotate'),
-                onTap: () async {
-                  // Rotate selected images logic here
-                  for (var toProcess in selectedImages){
-                    final cmd = img.Command()
-                    ..decodeImageFile(toProcess.path)
-                    ..grayscale()
-                    ..trim()
-                    ..writeToFile('${toProcess.path}.update.png');
-                    await cmd.executeThread();
-                  }
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.crop),
-                title: Text('Trim'),
-                onTap: () {
-                  // Rotate selected images logic here
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.brush),
-                title: Text('Re-color'),
-                onTap: () {
-                  // Rotate selected images logic here
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.contrast),
-                title: Text('Grayscale'),
-                onTap: () {
-                  // Rotate selected images logic here
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.filter),
-                title: Text('Apply Filter'),
-                onTap: () {
-                  // Apply filter to selected images logic here
-                  Navigator.pop(context);
-                },
-              ),
-              // Add more processing options here
-            ],
-          ),
-        );
-      },
-    );
-  }
+  
 }
