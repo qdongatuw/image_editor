@@ -127,7 +127,7 @@ class _ImageGridPageState extends State<ImageGridPage> {
                       onPressed: () {
                         _showBottomSheet(context);
                       },
-                      child: Text('Process Images'),
+                      child: const Text('Process Images'),
                     ),
                   ],
                 ),
@@ -141,15 +141,16 @@ class _ImageGridPageState extends State<ImageGridPage> {
 void _showBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
+    isScrollControlled: true,
     builder: (BuildContext context) {
-      return Container(
+      return SizedBox(
         height: 200,
         child: Column(
           children: [
             Container(
               height: 50,
               color: Colors.blue,
-              child: Center(
+              child: const Center(
                 child: Text(
                   '上部分可见内容',
                   style: TextStyle(
@@ -159,7 +160,7 @@ void _showBottomSheet(BuildContext context) {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               child: Center(
                 child: Text(
                   '下部分内容',
